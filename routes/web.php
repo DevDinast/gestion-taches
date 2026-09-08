@@ -4,7 +4,9 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-
+Route::get('/', function () {
+    return redirect('/dashboard');
+});
 
 Route::get('/dashboard', [TaskController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
 
