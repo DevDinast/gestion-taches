@@ -5,7 +5,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 RUN npm run build
 
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
     libzip-dev libpng-dev libonig-dev libxml2-dev zip unzip git curl \
