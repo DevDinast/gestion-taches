@@ -28,14 +28,31 @@ class TaskServices
 
     public function update(Request $request, Task $task)
     {
+      
+    $oldTask=$task->is_done;
+    $newTask=$request->boolean('is_done');
+
+    if($oldTask==false && $newTask==true)
+        {
+            $task->completed_at = now();
+        }
+        else if($oldTask==true && $newTask==false){
+            $task->completed_at = null;
+        }
+
+
         $task->update([
             'title' => $request->title,
             'description' => $request->description,
             'due_date' => $request->due_date,
-            'is_done' => $request->boolean('is_done'),
+            'is_done' => $newTask,
         ]);
 
+         
+
         return $task;
+
+
     }
 
     public function destroy(Task $task)

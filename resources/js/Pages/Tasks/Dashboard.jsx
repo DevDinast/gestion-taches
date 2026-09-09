@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { getDueStatus, formatDate } from '@/Utils/tasks';
 import AppLayout from '@/Layouts/AppLayout';
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 function Dashboard({ tasks }) {
     const { flash } = usePage().props;
@@ -51,6 +52,55 @@ function Dashboard({ tasks }) {
         .filter((t) => getDueStatus(t) === 'overdue')
         .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
         .slice(0, 5);
+
+
+    const calendrier = () => {
+        const days = [];
+
+        for (let i = 13; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            days.push({ date: date, count: 0 });
+        }
+        return days;
+    }
+
+
+    const compterTaches = (days, tasks) => {
+
+        tasks.forEach(task => {
+
+            // Étape 1 : ignorer les tâches jamais complétées
+            if (task.completed_at === null) {
+                return;
+            }
+
+            // Étape 2 : réduire la date de complétion à "année-mois-jour"
+            const dateCompletion = new Date(task.completed_at);
+            const jourCompletion = dateCompletion.toISOString().split('T')[0];
+
+            // Étape 3 : chercher le jour correspondant dans "days"
+            const jourCorrespondant = days.find(jour => {
+                const jourTexte = jour.date.toISOString().split('T')[0];
+                return jourTexte === jourCompletion;
+            });
+
+            // Étape 4 : si trouvé, incrémenter son compteur
+            if (jourCorrespondant) {
+                jourCorrespondant.count += 1;
+            }
+
+        });
+
+        return days;
+    };
+
+    // Construction des points du graphique : logique (date/count) + label lisible pour l'axe X
+    const donneesGraphique = compterTaches(calendrier(), tasks).map((jour) => ({
+        label: jour.date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+        count: jour.count,
+    }));
+
 
     return (
         <div className="px-8 py-8 max-w-5xl">
@@ -132,6 +182,19 @@ function Dashboard({ tasks }) {
                         <p className="text-sm text-slate-400">Rien d'urgent pour l'instant.</p>
                     )}
                 </div>
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-xl p-5 mb-6">
+                <h2 className="text-sm font-semibold text-slate-700 mb-4">Tâches complétées (14 derniers jours)</h2>
+                <ResponsiveContainer width="100%" height={260}>
+                    <LineChart data={donneesGraphique}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                        <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="#94a3b8" />
+                        <YAxis allowDecimals={false} tick={{ fontSize: 12 }} stroke="#94a3b8" />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="count" name="Tâches complétées" stroke="#059669" strokeWidth={2} dot={{ r: 3 }} />
+                    </LineChart>
+                </ResponsiveContainer>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
