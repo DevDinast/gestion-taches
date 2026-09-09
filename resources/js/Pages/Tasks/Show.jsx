@@ -1,6 +1,7 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState, useEffect } from "react";
 import { formatDate } from '@/Utils/tasks';
+import AppLayout from '@/Layouts/AppLayout';
 
 function Show({ tasks })
 {
@@ -22,7 +23,7 @@ function Show({ tasks })
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4 py-10">
+        <div className="flex flex-col items-center px-4 py-10">
             <div className="w-full max-w-lg">
                 {visibleMessage && (
                     <div className="mb-5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm font-medium text-center">
@@ -74,7 +75,7 @@ function Show({ tasks })
                         </span>
                     </div>
 
-                    
+                   
 
                     <div className="flex items-center gap-3 border-t border-gray-100 pt-5">
                         <Link
@@ -84,7 +85,7 @@ function Show({ tasks })
                             Modifier
                         </Link>
 
-                        
+                       
                     </div>
 
                     <Link
@@ -122,5 +123,7 @@ function Show({ tasks })
         </div>
     );
 }
+
+Show.layout = (page) => <AppLayout children={page} />;
 
 export default Show;

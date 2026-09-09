@@ -1,4 +1,5 @@
 import { Link, useForm } from '@inertiajs/react';
+import AppLayout from '@/Layouts/AppLayout';
 
 function Create()
 {
@@ -16,18 +17,14 @@ function Create()
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4 py-10">
-
+        <div className="flex flex-col items-center px-4 py-10">
             <div className="w-full max-w-md">
-
                 <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
                     Créer une tâche
                 </h1>
 
                 <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
-
                     <form onSubmit={handleSubmit}>
-
                         <div className="mb-5">
                             <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-1.5">
                                 Titre
@@ -84,7 +81,6 @@ function Create()
                         >
                             {processing ? 'Création...' : 'Créer la tâche'}
                         </button>
-
                     </form>
 
                     <Link
@@ -93,13 +89,12 @@ function Create()
                     >
                         ← Retour au dashboard
                     </Link>
-
                 </div>
-
             </div>
-
         </div>
     );
 }
+
+Create.layout = (page) => <AppLayout children={page} />;
 
 export default Create;
