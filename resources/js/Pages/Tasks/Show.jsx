@@ -58,17 +58,7 @@ function Show({ tasks })
                         </span>
                     </div>
 
-                    <button
-                        onClick={() => router.patch(`/tasks/${tasks.id}`, {
-                            title: tasks.title,
-                            description: tasks.description,
-                            due_date: tasks.due_date,
-                            is_done: !tasks.is_done,
-                        })}
-                        className="w-full mb-6 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium py-2.5 transition"
-                    >
-                        {!tasks.is_done ? 'Marquer comme terminée' : 'Marquer comme non terminée'}
-                    </button>
+                    
 
                     <div className="flex items-center gap-3 border-t border-gray-100 pt-5">
                         <Link
@@ -78,12 +68,7 @@ function Show({ tasks })
                             Modifier
                         </Link>
 
-                        <button
-                            onClick={handleDelete}
-                            className="flex-1 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-medium py-2.5 transition"
-                        >
-                            Supprimer
-                        </button>
+                        
                     </div>
 
                     <Link
