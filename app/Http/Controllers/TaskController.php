@@ -67,7 +67,8 @@ class TaskController extends Controller
 
         $this->taskServices->update($request, $tasks);
 
-        return back()->with('message', 'Tâche mise à jour avec succès !');
+        return redirect()->route('tasks.show', $tasks)
+            ->with('message', 'Tâche mise à jour avec succès !');
     }
 
     public function destroy(Task $tasks)

@@ -1,10 +1,20 @@
-import { Link, router } from '@inertiajs/react';
-import { useState } from "react";
+import { Link, router, usePage } from '@inertiajs/react';
+import { useState, useEffect } from "react";
 import { formatDate } from '@/Utils/tasks';
 
 function Show({ tasks })
 {
+    const { flash } = usePage().props;
     const [showConfirm, setShowConfirm] = useState(false);
+    const [visibleMessage, setVisibleMessage] = useState(flash.message);
+
+    useEffect(() => {
+        if (flash.message) {
+            setVisibleMessage(flash.message);
+            const timer = setTimeout(() => setVisibleMessage(null), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [flash.message]);
 
     function handleDelete()
     {
@@ -14,6 +24,12 @@ function Show({ tasks })
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4 py-10">
             <div className="w-full max-w-lg">
+                {visibleMessage && (
+                    <div className="mb-5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm font-medium text-center">
+                        {visibleMessage}
+                    </div>
+                )}
+
                 <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
                     Détails de la tâche
                 </h1>
