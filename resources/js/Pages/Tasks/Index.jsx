@@ -3,12 +3,15 @@ import { useState, useEffect } from 'react';
 import { getDueStatus, formatDate } from '@/Utils/tasks';
 import AppLayout from '@/Layouts/AppLayout';
 
+const ITEMS_PER_PAGE = 5;
+
 function Index({ tasks }) {
     const { flash } = usePage().props;
     const [visibleMessage, setVisibleMessage] = useState(flash.message);
     const [statusFilter, setStatusFilter] = useState(null);
     const [dueFilter, setDueFilter] = useState(null);
     const [taskToDelete, setTaskToDelete] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
         if (flash.message) {
@@ -42,6 +45,27 @@ function Index({ tasks }) {
 
         return matchesStatus && matchesDue;
     });
+
+    const totalPages = Math.max(1, Math.ceil(filteredTasks.length / ITEMS_PER_PAGE));
+
+    // Remet la page à 1 dès que les filtres changent, pour ne jamais rester
+    // bloqué sur une page qui n'existe plus après filtrage.
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [statusFilter, dueFilter]);
+
+    // Sécurité : si jamais currentPage dépasse le nombre de pages disponibles
+    // (ex: une tâche supprimée réduit le total), on la ramène à la dernière page valide.
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [totalPages, currentPage]);
+
+    const paginatedTasks = filteredTasks.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     function toggleDone(task) {
         router.patch(`/tasks/${task.id}`, {
@@ -112,8 +136,8 @@ function Index({ tasks }) {
             </div>
 
             <div className="space-y-3">
-                {filteredTasks.length > 0 ? (
-                    filteredTasks.map((task) => {
+                {paginatedTasks.length > 0 ? (
+                    paginatedTasks.map((task) => {
                         const dueStatus = getDueStatus(task);
                         return (
                             <div
@@ -179,6 +203,45 @@ function Index({ tasks }) {
                     </div>
                 )}
             </div>
+
+            {filteredTasks.length > ITEMS_PER_PAGE && (
+                <div className="flex items-center justify-between mt-6">
+                    <p className="text-xs text-slate-400">
+                        Page {currentPage} sur {totalPages} ({filteredTasks.length} tâche{filteredTasks.length > 1 ? 's' : ''})
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                            className="rounded-lg border border-slate-300 text-slate-600 text-sm font-medium px-3 py-1.5 hover:border-slate-400 disabled:opacity-40 disabled:hover:border-slate-300 transition"
+                        >
+                            ← Précédent
+                        </button>
+
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={
+                                    currentPage === page
+                                        ? "rounded-lg bg-slate-800 text-white text-sm font-medium px-3 py-1.5"
+                                        : "rounded-lg border border-slate-300 text-slate-600 text-sm font-medium px-3 py-1.5 hover:border-slate-400 transition"
+                                }
+                            >
+                                {page}
+                            </button>
+                        ))}
+
+                        <button
+                            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                            disabled={currentPage === totalPages}
+                            className="rounded-lg border border-slate-300 text-slate-600 text-sm font-medium px-3 py-1.5 hover:border-slate-400 disabled:opacity-40 disabled:hover:border-slate-300 transition"
+                        >
+                            Suivant →
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {taskToDelete && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center px-4 z-50">
