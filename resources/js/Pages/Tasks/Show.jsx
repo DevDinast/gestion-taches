@@ -1,26 +1,24 @@
 import { Link, router } from '@inertiajs/react';
 import { useState } from "react";
+import { formatDate } from '@/Utils/tasks';
 
 function Show({ tasks })
 {
+    const [showConfirm, setShowConfirm] = useState(false);
+
     function handleDelete()
     {
         setShowConfirm(true);
     }
 
-    const [showConfirm, setShowConfirm] = useState(false);
-
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4 py-10">
-
             <div className="w-full max-w-lg">
-
                 <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
                     Détails de la tâche
                 </h1>
 
                 <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
-
                     <div className="mb-5">
                         <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">
                             Titre
@@ -45,7 +43,7 @@ function Show({ tasks })
                                 Échéance
                             </h2>
                             <p className="text-gray-600">
-                                {tasks.due_date || 'Aucune date définie'}
+                                {tasks.due_date ? formatDate(tasks.due_date) : 'Aucune date définie'}
                             </p>
                         </div>
 
@@ -73,7 +71,6 @@ function Show({ tasks })
                     </button>
 
                     <div className="flex items-center gap-3 border-t border-gray-100 pt-5">
-
                         <Link
                             href={`/tasks/${tasks.id}/edit`}
                             className="flex-1 text-center rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 transition"
@@ -87,18 +84,15 @@ function Show({ tasks })
                         >
                             Supprimer
                         </button>
-
                     </div>
 
                     <Link
-                        href="/dashboard"
+                        href="/tasks"
                         className="mt-4 block text-center text-sm text-gray-500 hover:text-gray-700"
                     >
-                        ← Retour au dashboard
+                        ← Retour à la liste
                     </Link>
-
                 </div>
-
             </div>
 
             {showConfirm && (
@@ -124,7 +118,6 @@ function Show({ tasks })
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

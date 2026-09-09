@@ -12,6 +12,7 @@ class TaskController extends Controller
     public function __construct(private TaskServices $taskServices)
     {}
 
+    // GET /dashboard — stats uniquement
     public function index()
     {
         $tasks = $this->taskServices->index();
@@ -21,16 +22,21 @@ class TaskController extends Controller
         ]);
     }
 
+    // GET /tasks — liste complète et filtrable
+    public function list()
+    {
+        $tasks = $this->taskServices->index();
 
-
+        return Inertia::render('Tasks/Index', [
+            'tasks' => $tasks
+        ]);
+    }
 
     public function show(Task $tasks)
     {
-
-    return Inertia::render('Tasks/Show', [
+        return Inertia::render('Tasks/Show', [
             'tasks' => $tasks
         ]);
-
     }
 
     public function create()
@@ -40,10 +46,10 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
-       $tasks=$this->taskServices->create($request);
+        $this->taskServices->create($request);
 
-        return redirect()->route('dashboard')
-        ->with('message', 'Tâche créée avec succès !');
+        return redirect()->route('tasks.index')
+            ->with('message', 'Tâche créée avec succès !');
     }
 
     public function edit(Task $tasks)
@@ -55,16 +61,13 @@ class TaskController extends Controller
         ]);
     }
 
-
     public function update(Request $request, Task $tasks)
     {
         $this->authorize('update', $tasks);
 
-        $tasks = $this->taskServices->update($request, $tasks);
+        $this->taskServices->update($request, $tasks);
 
-        return redirect()->route('dashboard')
-        ->with('message', 'Tâche mise à jour avec succès !');
-            
+        return back()->with('message', 'Tâche mise à jour avec succès !');
     }
 
     public function destroy(Task $tasks)
@@ -73,7 +76,7 @@ class TaskController extends Controller
 
         $this->taskServices->destroy($tasks);
 
-        return redirect()->route('dashboard')
-        ->with('message', 'Tâche supprimée avec succès !');
+        return redirect()->route('tasks.index')
+            ->with('message', 'Tâche supprimée avec succès !');
     }
 }
